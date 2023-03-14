@@ -2,6 +2,7 @@
 
 namespace Fastly\PhpRuntime\Cli\Commands;
 
+use Fastly\PhpRuntime\Dependency\Runtime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,14 +26,12 @@ class BundleCommand extends Command
             'bundle.wasm'
         );
 
-        $defaultRuntime = dirname(__DIR__, 3) . '/runtime.wasm';
-
         $this->addOption(
             'runtime',
             'rt',
             InputOption::VALUE_OPTIONAL,
-            'Path to runtime',
-            $defaultRuntime
+            'Path to runtime or runtime version',
+            'latest'
         );
 
         $this->addOption(
@@ -49,14 +48,28 @@ class BundleCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $runtime = $input->getOption('runtime');
+        if (Runtime::exists($runtime)) {
+            $runtimePath = $runtime;
+        } else {
+            if ($runtime === 'latest') {
+                $runtime = Runtime::getLatestRuntimeVersion();
+            }
+
+            Runtime::ensureRuntimeVersion($runtime);
+
+            $runtimePath = Runtime::getRuntimeVersionPath($runtime);
+        }
 
         $code = $input->getArgument('code');
+        if (!file_exists($code)) {
+            throw new \RuntimeException('File not found: ' . $code);
+        }
 
         $codeType = $input->getOption('type');
         $output->writeln("Starting to bundle $code ($codeType) along with the runtime");
 
         if ($output->isVerbose()) {
-            $output->writeln('Using runtime: ' . $runtime);
+            $output->writeln('Using runtime: ' . $runtimePath);
         }
 
         $bundleOutput = $input->getOption('output');
@@ -68,7 +81,7 @@ class BundleCommand extends Command
             '--wasm-bulk-memory=true',
             '-o',
             $bundleOutput,
-            $runtime
+            $runtimePath
         ]);
 
         $wizer->setInput(file_get_contents($code));
