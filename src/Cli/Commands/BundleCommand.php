@@ -61,6 +61,7 @@ class BundleCommand extends Command
 
         $bundleOutput = $input->getOption('output');
 
+        // todo: download wizer dynamically
         $wizer = new Process([
             'wizer',
             '--allow-wasi',
