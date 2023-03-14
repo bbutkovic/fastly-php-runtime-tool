@@ -14,6 +14,9 @@
             "email": "dev@bbutkovic.com"
         }
     ],
+    "bin": [
+        "bin/fastly-compute-php"
+    ],
     "require": {
         "symfony/console": "^5.4",
         "symfony/process": "^5.4",
