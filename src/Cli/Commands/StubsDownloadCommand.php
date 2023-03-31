@@ -70,7 +70,7 @@ class StubsDownloadCommand extends Command
         $output->writeln('Stubs downloaded');
 
         // todo: better way of detecting if current directory is a git repo
-        if (!$noGitignore && is_dir('.git')) {
+        if (!$noGitignore && is_dir('.git') && !$this->alreadyGitignored($outputFile)) {
             $gitignoreEdited = $this->editGitignore($input, $output, $acceptGitignoreEdit, $outputFile);
             if ($gitignoreEdited) {
                 $output->writeln('.gitignore edited');
@@ -78,6 +78,12 @@ class StubsDownloadCommand extends Command
         }
 
         return 0;
+    }
+
+    private function alreadyGitignored(string $stubsFile = 'fastly-php-runtime.stubs.php'): bool
+    {
+        return file_exists('.gitignore') &&
+            preg_match("^/\/$stubsFile/g", file_get_contents('.gitignore'));
     }
 
     private function editGitignore(
