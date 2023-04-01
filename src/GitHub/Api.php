@@ -2,6 +2,7 @@
 
 namespace Fastly\PhpRuntime\GitHub;
 
+use Exception;
 use Fastly\PhpRuntime\Util;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -59,6 +60,10 @@ class Api
             throw new RuntimeException('$output file must be provided.');
         }
 
+        if ($version === 'latest') {
+            $version = self::getLatestRuntimeVersion();
+        }
+
         try {
             $assetsResponse = self::getHttpApiClient()->request('GET', "releases/tags/$version");
             $assetsBody = json_decode($assetsResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
@@ -82,8 +87,29 @@ class Api
                     'sink' => $output
                 ]
             );
-        } catch (\Exception | GuzzleException $e) {
+        } catch (Exception | GuzzleException $e) {
             throw new RuntimeException("Error with downloading release asset $asset: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws RuntimeException
+     * @return string
+     */
+    public static function getLatestRuntimeVersion(): string
+    {
+        $client = self::getHttpApiClient();
+
+        try {
+            $response = $client->get('releases/latest');
+
+            $responseBody = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+            return $responseBody['tag_name'];
+        } catch (Exception| GuzzleException $e) {
+            throw new RuntimeException(
+                'Failed to fetch latest runtime version information: ' . $e->getMessage()
+            );
         }
     }
 }

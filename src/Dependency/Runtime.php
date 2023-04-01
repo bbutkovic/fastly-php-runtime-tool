@@ -2,10 +2,8 @@
 
 namespace Fastly\PhpRuntime\Dependency;
 
-use Exception;
 use Fastly\PhpRuntime\GitHub\Api;
 use Fastly\PhpRuntime\Util;
-use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 
 class Runtime
@@ -43,23 +41,6 @@ class Runtime
     public static function exists(string $path): bool
     {
         return str_ends_with($path, '.wasm') && @file_exists($path);
-    }
-
-    public static function getLatestRuntimeVersion(): string
-    {
-        $client = Api::getHttpApiClient();
-
-        try {
-            $response = $client->get('releases/latest');
-
-            $responseBody = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
-            return $responseBody['tag_name'];
-        } catch (Exception| GuzzleException $e) {
-            throw new RuntimeException(
-                'Failed to fetch latest runtime version information: ' . $e->getMessage()
-            );
-        }
     }
 
     /**

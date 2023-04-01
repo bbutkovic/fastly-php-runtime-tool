@@ -3,6 +3,7 @@
 namespace Fastly\PhpRuntime\Cli\Commands;
 
 use Fastly\PhpRuntime\Dependency\Runtime;
+use Fastly\PhpRuntime\GitHub\Api;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,7 +53,7 @@ class BundleCommand extends Command
             $runtimePath = $runtime;
         } else {
             if ($runtime === 'latest') {
-                $runtime = Runtime::getLatestRuntimeVersion();
+                $runtime = Api::getLatestRuntimeVersion();
             }
 
             Runtime::ensureRuntimeVersion($runtime);

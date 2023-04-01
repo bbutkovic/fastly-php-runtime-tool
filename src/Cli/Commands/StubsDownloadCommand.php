@@ -63,11 +63,11 @@ class StubsDownloadCommand extends Command
         $noGitignore = (bool)$input->getOption('no-gitignore');
         $acceptGitignoreEdit = (bool)$input->getOption('accept-gitignore-edit');
 
-        $output->writeln('Downloading stubs...');
+        $output->writeln('Downloading Fastly Compute@Edge PHP stubs...');
 
         Stubs::downloadStubs($runtimeVersion, $outputFile);
 
-        $output->writeln('Stubs downloaded');
+        $output->writeln('Fastly Compute@Edge PHP stubs downloaded');
 
         // todo: better way of detecting if current directory is a git repo
         if (!$noGitignore && is_dir('.git') && !$this->alreadyGitignored($outputFile)) {
@@ -83,7 +83,10 @@ class StubsDownloadCommand extends Command
     private function alreadyGitignored(string $stubsFile = 'fastly-php-runtime.stubs.php'): bool
     {
         return file_exists('.gitignore') &&
-            preg_match("^/\/$stubsFile/g", file_get_contents('.gitignore'));
+            array_filter(
+                explode(PHP_EOL, file_get_contents('.gitignore')),
+                static fn($line) => str_starts_with($line, "/$stubsFile")
+            );
     }
 
     private function editGitignore(
@@ -95,7 +98,7 @@ class StubsDownloadCommand extends Command
         if (!$acceptGitignoreEditing) {
             // prompt for gitignore editing
             $confirmation = new ConfirmationQuestion(
-                "Would you like to automatically add $stubsFile to .gitignore?",
+                "Would you like to automatically add $stubsFile to .gitignore? (Y/n) ",
                 true
             );
 
@@ -107,7 +110,7 @@ class StubsDownloadCommand extends Command
             }
         }
 
-        file_put_contents('.gitignore', "\n/$stubsFile", FILE_APPEND);
+        file_put_contents('.gitignore', PHP_EOL . '/' . $stubsFile, FILE_APPEND);
 
         return true;
     }
