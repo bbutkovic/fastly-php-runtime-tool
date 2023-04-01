@@ -23,8 +23,7 @@
         "guzzlehttp/guzzle": "^7.0"
     },
     "scripts": {
-        "post-install-cmd": "fastly-compute-php stubs:download",
-        "post-update-cmd": "fastly-compute-php stubs:download",
-        "post-package-install": "fastly-compute-php stubs:download"
+        "post-package-install": "fastly-compute-php stubs:download",
+        "post-package-update": "fastly-compute-php stubs:downloda"
     }
 }
