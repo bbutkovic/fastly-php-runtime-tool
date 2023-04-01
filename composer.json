@@ -21,9 +21,5 @@
         "symfony/console": "^5.4",
         "symfony/process": "^5.4",
         "guzzlehttp/guzzle": "^7.0"
-    },
-    "scripts": {
-        "post-package-install": "fastly-compute-php stubs:download",
-        "post-package-update": "fastly-compute-php stubs:downloda"
     }
 }
