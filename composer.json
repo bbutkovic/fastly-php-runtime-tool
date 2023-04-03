@@ -2,7 +2,7 @@
     "name": "bbutkovic/fastly-php-runtime-tool",
     "description": "PHP runtime CLI for Fastly Compute@Edge",
     "type": "library",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Fastly\\PhpRuntime\\": "src/"
