@@ -71,7 +71,7 @@ class Api
 
             $releaseAssetId = '';
             foreach ($assets as $releaseAsset) {
-                if ($releaseAsset['name'] === 'runtime.wasm') {
+                if ($releaseAsset['name'] === $asset) {
                     $releaseAssetId = $releaseAsset['id'];
                     break;
                 }
